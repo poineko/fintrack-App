@@ -1,0 +1,75 @@
+name: fintrack
+description: Personal & Shared Finance Monitoring App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.3.2
+
+  # ── Database (Drift/SQLite) ───────────────────────────
+  drift: ^2.22.0
+  drift_flutter: ^0.2.4
+
+  # ── State Management ─────────────────────────────────
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # ── Navigation ───────────────────────────────────────
+  go_router: ^14.8.1
+
+  # ── UI & Charts ──────────────────────────────────────
+  fl_chart: ^0.70.2
+
+  # ── Utilities ────────────────────────────────────────
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
+
+  # ── Code Generators ──────────────────────────────────
+  build_runner: ^2.4.9
+  drift_dev: ^2.22.0
+  riverpod_generator: ^2.6.1
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  flutter_native_splash: ^2.4.7
+  change_app_package_name: ^1.5.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/fintrack_icon.png"
+  remove_alpha_ios: true  
+  min_sdk_android: 21
+  adaptive_icon_background: "#1B5E20"  # Warna hijau tua
+  adaptive_icon_foreground: "assets/icons/fintrack_icon.png"
+  web:
+    generate: false
+
+flutter_native_splash:
+  color: "#1B5E20"
+  image: assets/icons/fintrack_icon.png
+  android_12:
+    image: assets/icons/fintrack_icon.png
+    color: "#1B5E20"
+  
+  # Opsional: Jika ingin gambar full screen atau di posisi tertentu
+  fullscreen: true
