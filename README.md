@@ -18,12 +18,6 @@
 
 ## 📱 Screenshots
 
-| Dashboard | Transaksi | Kasbon | Analitik |
-|:---------:|:---------:|:------:|:--------:|
-| ![Dashboard](screenshots/dashboard.png) | ![Transaksi](screenshots/transaksi.png) | ![Kasbon](screenshots/kasbon.png) | ![Analitik](screenshots/analitik.png) |
-
----
-
 | Dashboard | Dompet | Transaksi | Kasbon | Piutang | Hutang | Analitik |
 |:---------:|:------:|:---------:|:------:|:-------:|:------:|:--------:|
 | ![Dashboard](screenshots/dashboard.png) | ![Dompet](screenshots/dompet.png) | ![Transaksi](screenshots/transaksi.png) | ![Kasbon](screenshots/kasbon.png) | ![Piutang](screenshots/piutang.png) | ![Hutang](screenshots/hutang.png) | ![Analitik](screenshots/analitik.png) |
