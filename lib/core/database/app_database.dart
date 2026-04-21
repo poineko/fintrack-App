@@ -5,22 +5,24 @@ import '../../models/wallet.dart';
 import '../../models/transaction.dart';
 import '../../models/internal_debt.dart';
 import '../../models/receivable.dart';
+import '../../models/debt.dart';
 
 part 'app_database.g.dart';
 
 @DriftDatabase(
   tables: [
     Wallets,
-    InternalDebts,   // Urutan penting! InternalDebts & Receivables
-    Receivables,     // harus sebelum Transactions (foreign key)
+    InternalDebts, // Urutan penting! InternalDebts & Receivables
+    Receivables, // harus sebelum Transactions (foreign key)
     Transactions,
+    Debts,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2; // ← Naikkan versi
 
   @override
   MigrationStrategy get migration {
@@ -29,7 +31,9 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (Migrator m, int from, int to) async {
-        // Isi saat schemaVersion naik
+        if (from < 2) {
+          await m.createTable(debts);
+        }
       },
       beforeOpen: (details) async {
         // Aktifkan foreign key enforcement

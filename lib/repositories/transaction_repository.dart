@@ -44,6 +44,7 @@ class TransactionRepository {
   }
 
   /// Stream total expense bulan ini — REAKTIF
+  /// Stream total expense bulan ini — exclude deleted & kasbon/piutang
   Stream<double> watchTotalExpenseThisMonth() {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, 1);
@@ -53,7 +54,12 @@ class TransactionRepository {
           ..where((t) =>
               t.isDeleted.equals(false) &
               t.type.equals('expense') &
-              t.date.isBetweenValues(start, end)))
+              t.date.isBetweenValues(start, end) &
+              // Exclude piutang dari hitungan expense biasa
+              t.category.isNotIn([
+                'receivableGiven',
+                'internalDebtBorrow',
+              ])))
         .watch()
         .map((txs) => txs.fold<double>(0.0, (sum, t) => sum + t.amount));
   }
@@ -68,7 +74,12 @@ class TransactionRepository {
           ..where((t) =>
               t.isDeleted.equals(false) &
               t.type.equals('income') &
-              t.date.isBetweenValues(start, end)))
+              t.date.isBetweenValues(start, end) &
+              // Exclude penerimaan kasbon/piutang dari income biasa
+              t.category.isNotIn([
+                'receivableCollection',
+                'internalDebtRepayment',
+              ])))
         .watch()
         .map((txs) => txs.fold<double>(0.0, (sum, t) => sum + t.amount));
   }
@@ -119,8 +130,15 @@ class TransactionRepository {
   // UPDATE
   // ─────────────────────────────────────────
 
-  Future<bool> updateTransaction(TransactionsCompanion transaction) {
-    return _db.update(_db.transactions).replace(transaction);
+  // Future<bool> updateTransaction(TransactionsCompanion transaction) {
+  //   return _db.update(_db.transactions).replace(transaction);
+  // }
+
+  Future<bool> updateTransaction(TransactionsCompanion transaction) async {
+    final rowsAffected = await (_db.update(_db.transactions)
+          ..where((t) => t.id.equals(transaction.id.value)))
+        .write(transaction);
+    return rowsAffected > 0;
   }
 
   /// Ambil transaksi by ID

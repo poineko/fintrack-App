@@ -1,24 +1,23 @@
-// lib/features/receivables/screens/receivable_form_screen.dart
+// lib/features/debts/screens/debt_form_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_helper.dart';
-import '../../../providers/receivable_provider.dart';
+import '../../../providers/debt_provider.dart';
 import '../../../providers/wallet_provider.dart';
 
-class ReceivableFormScreen extends ConsumerStatefulWidget {
-  const ReceivableFormScreen({super.key});
+class DebtFormScreen extends ConsumerStatefulWidget {
+  const DebtFormScreen({super.key});
 
   @override
-  ConsumerState<ReceivableFormScreen> createState() =>
-      _ReceivableFormScreenState();
+  ConsumerState<DebtFormScreen> createState() =>
+      _DebtFormScreenState();
 }
 
-class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
+class _DebtFormScreenState extends ConsumerState<DebtFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _contactController = TextEditingController();
@@ -26,11 +25,9 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
   final _purposeController = TextEditingController();
   final _noteController = TextEditingController();
 
-  Wallet? _sourceWallet;
-  DateTime? _targetReturnDate;
+  Wallet? _targetWallet;
+  DateTime? _targetPaymentDate;
   bool _isLoading = false;
-
-  final _uuid = const Uuid();
 
   @override
   void dispose() {
@@ -42,24 +39,26 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
     super.dispose();
   }
 
-  Future<void> _pickTargetDate() async {
+  Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().add(const Duration(days: 30)),
+      initialDate:
+          DateTime.now().add(const Duration(days: 30)),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+      lastDate:
+          DateTime.now().add(const Duration(days: 365 * 5)),
     );
     if (picked != null) {
-      setState(() => _targetReturnDate = picked);
+      setState(() => _targetPaymentDate = picked);
     }
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_sourceWallet == null) {
+    if (_targetWallet == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Pilih dompet sumber dana'),
+          content: Text('Pilih wallet tujuan dana'),
           backgroundColor: AppColors.expense,
         ),
       );
@@ -69,21 +68,22 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final amount =
-          double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0.0;
+      final amount = double.tryParse(
+              _amountController.text.replaceAll('.', '')) ??
+          0.0;
 
-      await ref.read(receivableNotifierProvider.notifier).createReceivable(
-            borrowerName: _nameController.text.trim(),
-            borrowerContact: _contactController.text.trim().isEmpty
-                ? null
-                : _contactController.text.trim(),
+      await ref.read(debtNotifierProvider.notifier).createDebt(
+            creditorName: _nameController.text.trim(),
+            creditorContact:
+                _contactController.text.trim().isEmpty
+                    ? null
+                    : _contactController.text.trim(),
             amount: amount,
-            sourceWalletId: _sourceWallet!.id,
-            uuid: _uuid.v4(),
-            targetReturnDate: _targetReturnDate,
+            targetWalletId: _targetWallet!.id,
             purpose: _purposeController.text.trim().isEmpty
                 ? null
                 : _purposeController.text.trim(),
+            targetPaymentDate: _targetPaymentDate,
             note: _noteController.text.trim().isEmpty
                 ? null
                 : _noteController.text.trim(),
@@ -93,7 +93,7 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Piutang berhasil dicatat'),
+            content: Text('Hutang berhasil dicatat'),
             backgroundColor: AppColors.income,
           ),
         );
@@ -117,39 +117,39 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
     final walletsAsync = ref.watch(allWalletsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Catat Piutang')),
+      appBar: AppBar(title: const Text('Catat Hutang')),
       body: walletsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () =>
+            const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (wallets) => Form(
           key: _formKey,
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // ── Info Banner ──────────────────
+              // Info banner
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.income.withValues(alpha: 0.1),
+                  color: AppColors.expense
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppColors.income.withValues(alpha: 0.4),
+                    color: AppColors.expense
+                        .withValues(alpha: 0.3),
                   ),
                 ),
                 child: const Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: AppColors.income,
-                      size: 18,
-                    ),
+                    Icon(Icons.info_outline,
+                        color: AppColors.expense, size: 18),
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Saldo dompet akan berkurang sebesar jumlah piutang dan dicatat sebagai uang yang dipinjamkan.',
+                        'Dana akan masuk ke wallet yang dipilih. Catat hutang Anda ke orang lain di sini.',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.income,
+                          color: AppColors.expense,
                         ),
                       ),
                     ),
@@ -159,31 +159,25 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
 
               const SizedBox(height: 16),
 
-              // ── Nama Peminjam ────────────────
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Nama Peminjam',
-                  hintText: 'Contoh: Budi Santoso',
+                  labelText: 'Nama Pemberi Hutang',
+                  hintText: 'Contoh: Pak Budi',
                   prefixIcon: Icon(Icons.person_outline),
                 ),
                 textCapitalization: TextCapitalization.words,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Nama peminjam tidak boleh kosong';
-                  }
-                  return null;
-                },
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? 'Nama tidak boleh kosong'
+                    : null,
               ),
 
               const SizedBox(height: 16),
 
-              // ── Kontak (opsional) ────────────
               TextFormField(
                 controller: _contactController,
                 decoration: const InputDecoration(
-                  labelText: 'Nomor HP / Kontak (opsional)',
-                  hintText: '08xxxxxxxxxx',
+                  labelText: 'Nomor HP (opsional)',
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
                 keyboardType: TextInputType.phone,
@@ -191,11 +185,10 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
 
               const SizedBox(height: 16),
 
-              // ── Jumlah ───────────────────────
               TextFormField(
                 controller: _amountController,
                 decoration: const InputDecoration(
-                  labelText: 'Jumlah Piutang',
+                  labelText: 'Jumlah Hutang',
                   prefixText: 'Rp ',
                   prefixIcon: Icon(Icons.payments_outlined),
                 ),
@@ -211,8 +204,7 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
                   if (v == null || v.isEmpty) {
                     return 'Jumlah tidak boleh kosong';
                   }
-                  final amount = double.tryParse(v) ?? 0;
-                  if (amount <= 0) {
+                  if ((double.tryParse(v) ?? 0) <= 0) {
                     return 'Jumlah harus lebih dari 0';
                   }
                   return null;
@@ -221,43 +213,39 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
 
               const SizedBox(height: 16),
 
-              // ── Dari Dompet ──────────────────
-              _ReceivableWalletDropdown(
-                wallets: wallets,
-                selected: _sourceWallet,
-                onChanged: (w) => setState(() => _sourceWallet = w),
-              ),
+              // Wallet dropdown
+              _buildWalletDropdown(wallets),
 
               const SizedBox(height: 16),
 
-              // ── Tujuan Pinjaman ──────────────
               TextFormField(
                 controller: _purposeController,
                 decoration: const InputDecoration(
-                  labelText: 'Tujuan Pinjaman (opsional)',
+                  labelText: 'Keperluan (opsional)',
                   hintText: 'Contoh: Modal usaha',
-                  prefixIcon: Icon(Icons.description_outlined),
+                  prefixIcon:
+                      Icon(Icons.description_outlined),
                 ),
-                textCapitalization: TextCapitalization.sentences,
               ),
 
               const SizedBox(height: 16),
 
-              // ── Target Kembali ───────────────
               InkWell(
-                onTap: _pickTargetDate,
+                onTap: _pickDate,
                 child: InputDecorator(
                   decoration: const InputDecoration(
-                    labelText: 'Target Kembali (opsional)',
-                    prefixIcon: Icon(Icons.calendar_today_outlined),
+                    labelText: 'Target Bayar (opsional)',
+                    prefixIcon:
+                        Icon(Icons.calendar_today_outlined),
                     suffixIcon: Icon(Icons.arrow_drop_down),
                   ),
                   child: Text(
-                    _targetReturnDate == null
-                        ? 'Pilih tanggal target kembali'
-                        : DateHelper.formatDate(_targetReturnDate!),
+                    _targetPaymentDate == null
+                        ? 'Pilih tanggal'
+                        : DateHelper
+                            .formatDate(_targetPaymentDate!),
                     style: TextStyle(
-                      color: _targetReturnDate == null
+                      color: _targetPaymentDate == null
                           ? AppColors.textHint
                           : AppColors.textPrimary,
                       fontSize: 14,
@@ -268,7 +256,6 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
 
               const SizedBox(height: 16),
 
-              // ── Catatan ──────────────────────
               TextFormField(
                 controller: _noteController,
                 decoration: const InputDecoration(
@@ -280,12 +267,14 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
 
               const SizedBox(height: 32),
 
-              // ── Submit ───────────────────────
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton.icon(
                   onPressed: _isLoading ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.expense,
+                  ),
                   icon: _isLoading
                       ? const SizedBox(
                           width: 18,
@@ -297,7 +286,7 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
                         )
                       : const Icon(Icons.save_outlined),
                   label: const Text(
-                    'Catat Piutang',
+                    'Catat Hutang',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -310,65 +299,29 @@ class _ReceivableFormScreenState extends ConsumerState<ReceivableFormScreen> {
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────
-// WALLET DROPDOWN
-// ─────────────────────────────────────────────
-
-class _ReceivableWalletDropdown extends StatelessWidget {
-  final List<Wallet> wallets;
-  final Wallet? selected;
-  final ValueChanged<Wallet?> onChanged;
-
-  const _ReceivableWalletDropdown({
-    required this.wallets,
-    required this.selected,
-    required this.onChanged,
-  });
-
-  Color _colorFor(String category) {
-    switch (category) {
-      case 'personal':
-        return AppColors.personal;
-      case 'shared':
-        return AppColors.shared;
-      case 'emergency':
-        return AppColors.emergency;
-      default:
-        return AppColors.primary;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentValue = selected == null
+  Widget _buildWalletDropdown(List<Wallet> wallets) {
+    final currentValue = _targetWallet == null
         ? null
-        : wallets.where((w) => w.id == selected!.id).firstOrNull;
+        : wallets
+            .where((w) => w.id == _targetWallet!.id)
+            .firstOrNull;
 
     return DropdownButtonFormField<Wallet>(
       initialValue: currentValue,
       decoration: const InputDecoration(
-        labelText: 'Dana Dari Dompet',
-        prefixIcon: Icon(Icons.account_balance_wallet_outlined),
+        labelText: 'Dana Masuk ke Dompet',
+        prefixIcon:
+            Icon(Icons.account_balance_wallet_outlined),
       ),
-      hint: const Text('Pilih dompet sumber'),
+      hint: const Text('Pilih dompet'),
       isExpanded: true,
       items: wallets.map((w) {
-        final color = _colorFor(w.category);
         return DropdownMenuItem<Wallet>(
           value: w,
           child: Row(
             children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   w.name,
@@ -386,7 +339,7 @@ class _ReceivableWalletDropdown extends StatelessWidget {
           ),
         );
       }).toList(),
-      onChanged: onChanged,
+      onChanged: (w) => setState(() => _targetWallet = w),
     );
   }
 }

@@ -173,8 +173,7 @@ class ReceivableRepository {
   /// Write-off piutang — tandai tidak bisa ditagih
   /// Saldo TIDAK dikembalikan ke wallet
   Future<void> writeOffReceivable(int receivableId) async {
-    await (_db.update(_db.receivables)
-          ..where((r) => r.id.equals(receivableId)))
+    await (_db.update(_db.receivables)..where((r) => r.id.equals(receivableId)))
         .write(ReceivablesCompanion(
       status: Value(ReceivableStatus.writeOff.name),
       collectedAt: Value(DateTime.now()),

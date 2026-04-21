@@ -1,23 +1,24 @@
-// lib/features/internal_debt/screens/kasbon_list_screen.dart
+// lib/features/debts/screens/debt_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../providers/internal_debt_provider.dart';
-import '../widgets/kasbon_tile.dart';
-import 'kasbon_form_screen.dart';
-import 'repay_kasbon_screen.dart';
+import '../../../providers/debt_provider.dart';
+import '../widgets/debt_tile.dart';
+import 'debt_form_screen.dart';
+import 'pay_debt_screen.dart';
 
-class KasbonListScreen extends ConsumerStatefulWidget {
-  const KasbonListScreen({super.key});
+class DebtListScreen extends ConsumerStatefulWidget {
+  const DebtListScreen({super.key});
 
   @override
-  ConsumerState<KasbonListScreen> createState() => _KasbonListScreenState();
+  ConsumerState<DebtListScreen> createState() =>
+      _DebtListScreenState();
 }
 
-class _KasbonListScreenState extends ConsumerState<KasbonListScreen>
+class _DebtListScreenState
+    extends ConsumerState<DebtListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -35,19 +36,19 @@ class _KasbonListScreenState extends ConsumerState<KasbonListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final activeDebtsAsync = ref.watch(activeDebtsProvider);
-    final allDebtsAsync = ref.watch(allDebtsProvider);
-    final totalDebtAsync = ref.watch(totalActiveDebtProvider);
+    final activeAsync = ref.watch(activeMyDebtsProvider);
+    final allAsync = ref.watch(allMyDebtsProvider);
+    final totalAsync = ref.watch(totalMyDebtProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.navKasbon),
+        title: const Text('Hutang Saya'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => const KasbonFormScreen(),
+                builder: (_) => const DebtFormScreen(),
               ),
             ),
           ),
@@ -65,33 +66,32 @@ class _KasbonListScreenState extends ConsumerState<KasbonListScreen>
       ),
       body: Column(
         children: [
-          // ── Total Kasbon Header ────────────
+          // ── Total Header ─────────────────
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: AppColors.active.withValues(alpha: 0.1),
+            color: AppColors.expense.withValues(alpha: 0.1),
             child: Row(
               children: [
-                const Icon(
-                  Icons.warning_amber_rounded,
-                  color: AppColors.active,
-                ),
+                const Icon(Icons.credit_card_outlined,
+                    color: AppColors.expense),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Total Kasbon Aktif',
+                      'Total Hutang Aktif',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    totalDebtAsync.when(
+                    totalAsync.when(
                       loading: () => const SizedBox(
                         height: 16,
                         width: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2),
                       ),
                       error: (_, __) => const Text('Error'),
                       data: (total) => Text(
@@ -99,7 +99,7 @@ class _KasbonListScreenState extends ConsumerState<KasbonListScreen>
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.active,
+                          color: AppColors.expense,
                         ),
                       ),
                     ),
@@ -109,31 +109,28 @@ class _KasbonListScreenState extends ConsumerState<KasbonListScreen>
             ),
           ),
 
-          // ── Tab Views ─────────────────────
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Tab 1: Kasbon Aktif
-                _KasbonList(
-                  debtsAsync: activeDebtsAsync,
-                  emptyMessage: 'Tidak ada kasbon aktif 🎉',
-                  emptySubMessage: 'Semua kasbon sudah lunas',
-                  onRepay: (debt) => Navigator.of(context).push(
+                _DebtList(
+                  debtsAsync: activeAsync,
+                  emptyMessage: 'Tidak ada hutang aktif 🎉',
+                  emptySubMessage: 'Semua hutang sudah lunas',
+                  onPay: (d) => Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => RepayKasbonScreen(debt: debt),
+                      builder: (_) => PayDebtScreen(debt: d),
                     ),
                   ),
                 ),
-
-                // Tab 2: Semua Kasbon
-                _KasbonList(
-                  debtsAsync: allDebtsAsync,
-                  emptyMessage: 'Belum ada kasbon',
-                  emptySubMessage: 'Tap + untuk ambil kasbon',
-                  onRepay: (debt) => Navigator.of(context).push(
+                _DebtList(
+                  debtsAsync: allAsync,
+                  emptyMessage: 'Belum ada hutang tercatat',
+                  emptySubMessage:
+                      'Tap + untuk catat hutang baru',
+                  onPay: (d) => Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => RepayKasbonScreen(debt: debt),
+                      builder: (_) => PayDebtScreen(debt: d),
                     ),
                   ),
                 ),
@@ -145,39 +142,36 @@ class _KasbonListScreenState extends ConsumerState<KasbonListScreen>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => const KasbonFormScreen(),
+            builder: (_) => const DebtFormScreen(),
           ),
         ),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.expense,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Ambil Kasbon'),
+        label: const Text('Catat Hutang'),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────
-// KASBON LIST WIDGET
-// ─────────────────────────────────────────────
-
-class _KasbonList extends StatelessWidget {
-  final AsyncValue<List<InternalDebt>> debtsAsync;
+class _DebtList extends StatelessWidget {
+  final AsyncValue<List<Debt>> debtsAsync;
   final String emptyMessage;
   final String emptySubMessage;
-  final void Function(InternalDebt) onRepay;
+  final void Function(Debt) onPay;
 
-  const _KasbonList({
+  const _DebtList({
     required this.debtsAsync,
     required this.emptyMessage,
     required this.emptySubMessage,
-    required this.onRepay,
+    required this.onPay,
   });
 
   @override
   Widget build(BuildContext context) {
     return debtsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () =>
+          const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (debts) {
         if (debts.isEmpty) {
@@ -185,43 +179,32 @@ class _KasbonList extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.check_circle_outline,
-                  size: 64,
-                  color: AppColors.textHint,
-                ),
+                const Icon(Icons.credit_card_outlined,
+                    size: 64, color: AppColors.textHint),
                 const SizedBox(height: 16),
-                Text(
-                  emptyMessage,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(emptyMessage,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500)),
                 const SizedBox(height: 4),
-                Text(
-                  emptySubMessage,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textHint,
-                  ),
-                ),
+                Text(emptySubMessage,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textHint)),
               ],
             ),
           );
         }
-
         return ListView.builder(
           padding: const EdgeInsets.only(top: 8, bottom: 80),
           itemCount: debts.length,
-          itemBuilder: (context, index) {
-            final debt = debts[index];
-            return KasbonTile(
-              debt: debt,
-              onRepay: debt.status != 'settled' ? () => onRepay(debt) : null,
-            );
-          },
+          itemBuilder: (context, index) => DebtTile(
+            debt: debts[index],
+            onPay: debts[index].status != 'settled'
+                ? () => onPay(debts[index])
+                : null,
+          ),
         );
       },
     );

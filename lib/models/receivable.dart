@@ -8,15 +8,12 @@ class Receivables extends Table {
   TextColumn get borrowerContact => text().nullable()();
   RealColumn get originalAmount => real()();
   RealColumn get remainingAmount => real()();
-  TextColumn get status =>
-      text().withDefault(const Constant('active'))();
-  IntColumn get sourceWalletId =>
-      integer().references(Wallets, #id)();
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  IntColumn get sourceWalletId => integer().references(Wallets, #id)();
   DateTimeColumn get lentAt => dateTime()();
   DateTimeColumn get targetReturnDate => dateTime().nullable()();
   DateTimeColumn get collectedAt => dateTime().nullable()();
   TextColumn get purpose => text().nullable()();
   TextColumn get note => text().nullable()();
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

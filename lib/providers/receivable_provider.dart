@@ -9,8 +9,7 @@ import 'wallet_provider.dart';
 // REPOSITORY PROVIDER
 // ─────────────────────────────────────────────
 
-final receivableRepositoryProvider =
-    Provider<ReceivableRepository>((ref) {
+final receivableRepositoryProvider = Provider<ReceivableRepository>((ref) {
   return ReceivableRepository(
     ref.watch(databaseProvider),
     ref.watch(walletRepositoryProvider),
@@ -21,29 +20,20 @@ final receivableRepositoryProvider =
 // STREAM PROVIDERS
 // ─────────────────────────────────────────────
 
-final activeReceivablesProvider =
-    StreamProvider<List<Receivable>>((ref) {
-  return ref
-      .watch(receivableRepositoryProvider)
-      .watchActiveReceivables();
+final activeReceivablesProvider = StreamProvider<List<Receivable>>((ref) {
+  return ref.watch(receivableRepositoryProvider).watchActiveReceivables();
 });
 
-final allReceivablesProvider =
-    StreamProvider<List<Receivable>>((ref) {
-  return ref
-      .watch(receivableRepositoryProvider)
-      .watchAllReceivables();
+final allReceivablesProvider = StreamProvider<List<Receivable>>((ref) {
+  return ref.watch(receivableRepositoryProvider).watchAllReceivables();
 });
 
 // ─────────────────────────────────────────────
 // STREAM TOTAL — reaktif
 // ─────────────────────────────────────────────
 
-final totalActiveReceivablesProvider =
-    StreamProvider<double>((ref) {
-  return ref
-      .watch(receivableRepositoryProvider)
-      .watchTotalActiveReceivables();
+final totalActiveReceivablesProvider = StreamProvider<double>((ref) {
+  return ref.watch(receivableRepositoryProvider).watchTotalActiveReceivables();
 });
 
 // ─────────────────────────────────────────────

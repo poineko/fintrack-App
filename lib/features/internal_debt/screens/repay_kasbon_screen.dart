@@ -14,8 +14,7 @@ class RepayKasbonScreen extends ConsumerStatefulWidget {
   const RepayKasbonScreen({super.key, required this.debt});
 
   @override
-  ConsumerState<RepayKasbonScreen> createState() =>
-      _RepayKasbonScreenState();
+  ConsumerState<RepayKasbonScreen> createState() => _RepayKasbonScreenState();
 }
 
 class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
@@ -38,8 +37,7 @@ class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
     setState(() {
       _payFull = value;
       if (value) {
-        _amountController.text =
-            widget.debt.remainingAmount.toStringAsFixed(0);
+        _amountController.text = widget.debt.remainingAmount.toStringAsFixed(0);
       } else {
         _amountController.clear();
       }
@@ -53,12 +51,9 @@ class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
 
     try {
       final amount =
-          double.tryParse(_amountController.text.replaceAll('.', '')) ??
-              0.0;
+          double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0.0;
 
-      await ref
-          .read(internalDebtNotifierProvider.notifier)
-          .repayKasbon(
+      await ref.read(internalDebtNotifierProvider.notifier).repayKasbon(
             debtId: widget.debt.id,
             repayAmount: amount,
             uuid: _uuid.v4(),
@@ -120,8 +115,7 @@ class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
                     ),
                     const SizedBox(height: 12),
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           'Total Kasbon',
@@ -131,16 +125,14 @@ class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
                           ),
                         ),
                         Text(
-                          CurrencyFormatter.format(
-                              widget.debt.originalAmount),
+                          CurrencyFormatter.format(widget.debt.originalAmount),
                           style: const TextStyle(fontSize: 13),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           'Sudah Dibayar',
@@ -163,8 +155,7 @@ class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
                     ),
                     const Divider(height: 16),
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           'Sisa Kasbon',
@@ -174,8 +165,7 @@ class _RepayKasbonScreenState extends ConsumerState<RepayKasbonScreen> {
                           ),
                         ),
                         Text(
-                          CurrencyFormatter.format(
-                              widget.debt.remainingAmount),
+                          CurrencyFormatter.format(widget.debt.remainingAmount),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,

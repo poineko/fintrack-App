@@ -63,35 +63,35 @@ class DashboardScreen extends ConsumerWidget {
                   summaryAsync.when(
                     loading: () => const _LoadingSection(),
                     error: (e, _) => _ErrorSection(message: e.toString()),
-                    data: (summary) => _CategorySummarySection(
-                      summary: summary,
-                    ),
+                    data: (summary) =>
+                        _CategorySummarySection(summary: summary),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12), // ← Konsisten
 
-                  // ── Kasbon Aktif (jika ada) ────
+                  // ── Kasbon Aktif ───────────────
                   activeDebtsAsync.when(
                     loading: () => const SizedBox.shrink(),
                     error: (_, __) => const SizedBox.shrink(),
                     data: (debts) => debts.isEmpty
                         ? const SizedBox.shrink()
-                        : _ActiveKasbonSection(
-                            totalDebt: debts.fold<double>(
-                                0, (s, d) => s + d.remainingAmount),
-                            count: debts.length,
-                            onTap: () => context.go('/kasbon'), // ← TAMBAH INI
+                        : Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _ActiveKasbonSection(
+                              totalDebt: debts.fold<double>(
+                                  0, (s, d) => s + d.remainingAmount),
+                              count: debts.length,
+                              onTap: () => context.go('/kasbon'),
+                            ),
                           ),
                   ),
 
-                  const SizedBox(height: 16),
-
-                  // ── Chart Bulan Ini ───────────
+                  // ── Chart ─────────────────────
                   const FinancialChart(),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
-                  // ── Transaksi Terakhir ────────
+                  // ── Transaksi Terakhir ─────────
                   const Card(
                     margin: EdgeInsets.symmetric(horizontal: 16),
                     child: RecentTransactions(),
@@ -208,99 +208,125 @@ class _CategorySummarySection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+
+          // ── Row 1 ──────────────────────
+          IntrinsicHeight(
+            // ← Pastikan tinggi sama
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: WalletSummaryCard(
+                    title: AppStrings.categoryPersonal,
+                    amount: summary.totalPersonal,
+                    color: AppColors.personal,
+                    icon: Icons.person_outline,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: WalletSummaryCard(
+                    title: AppStrings.categoryShared,
+                    amount: summary.totalShared,
+                    color: AppColors.shared,
+                    icon: Icons.people_outline,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // ── Row 2 ──────────────────────
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: WalletSummaryCard(
+                    title: AppStrings.categoryEmergency,
+                    amount: summary.totalEmergency,
+                    color: AppColors.emergency,
+                    icon: Icons.shield_outlined,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _SavingsRatioCard(summary: summary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Pisahkan ke widget sendiri ────────────
+class _SavingsRatioCard extends StatelessWidget {
+  final DashboardSummary summary;
+
+  const _SavingsRatioCard({required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = summary.isDeficit ? AppColors.expense : AppColors.income;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
           Row(
             children: [
-              Expanded(
-                child: WalletSummaryCard(
-                  title: AppStrings.categoryPersonal,
-                  amount: summary.totalPersonal,
-                  color: AppColors.personal,
-                  icon: Icons.person_outline,
-                ),
+              Icon(
+                summary.isDeficit
+                    ? Icons.trending_down
+                    : Icons.savings_outlined,
+                color: color,
+                size: 18,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Expanded(
-                child: WalletSummaryCard(
-                  title: AppStrings.categoryShared,
-                  amount: summary.totalShared,
-                  color: AppColors.shared,
-                  icon: Icons.people_outline,
+                child: Text(
+                  summary.isDeficit ? 'Defisit' : 'Rasio Hemat',
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: WalletSummaryCard(
-                  title: AppStrings.categoryEmergency,
-                  amount: summary.totalEmergency,
-                  color: AppColors.emergency,
-                  icon: Icons.shield_outlined,
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Rasio Tabungan
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: summary.isDeficit
-                        ? AppColors.expense.withValues(alpha: 0.1)
-                        : AppColors.income.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: summary.isDeficit
-                          ? AppColors.expense.withValues(alpha: 0.3)
-                          : AppColors.income.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            summary.isDeficit
-                                ? Icons.trending_down
-                                : Icons.savings_outlined,
-                            color: summary.isDeficit
-                                ? AppColors.expense
-                                : AppColors.income,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            summary.isDeficit ? 'Defisit' : 'Rasio Hemat',
-                            style: TextStyle(
-                              color: summary.isDeficit
-                                  ? AppColors.expense
-                                  : AppColors.income,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        summary.isDeficit
-                            ? '-${summary.savingsRatio.abs().toStringAsFixed(1)}%'
-                            : '${summary.savingsRatio.toStringAsFixed(1)}%',
-                        style: TextStyle(
-                          color: summary.isDeficit
-                              ? AppColors.expense
-                              : AppColors.income,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            summary.isDeficit
+                ? '-${summary.savingsRatio.abs().toStringAsFixed(1)}%'
+                : '${summary.savingsRatio.toStringAsFixed(1)}%',
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          Text(
+            'bulan ini',
+            style: TextStyle(
+              color: color.withValues(alpha: 0.7),
+              fontSize: 11,
+            ),
           ),
         ],
       ),

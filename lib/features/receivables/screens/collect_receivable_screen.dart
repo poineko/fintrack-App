@@ -69,12 +69,9 @@ class _CollectReceivableScreenState
 
     try {
       final amount =
-          double.tryParse(_amountController.text.replaceAll('.', '')) ??
-              0.0;
+          double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0.0;
 
-      await ref
-          .read(receivableNotifierProvider.notifier)
-          .collectReceivable(
+      await ref.read(receivableNotifierProvider.notifier).collectReceivable(
             receivableId: widget.receivable.id,
             collectAmount: amount,
             targetWalletId: _targetWallet!.id,
@@ -118,8 +115,7 @@ class _CollectReceivableScreenState
     return Scaffold(
       appBar: AppBar(title: const Text('Terima Pembayaran')),
       body: walletsAsync.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (wallets) => Form(
           key: _formKey,
@@ -137,8 +133,8 @@ class _CollectReceivableScreenState
                       Row(
                         children: [
                           CircleAvatar(
-                            backgroundColor: AppColors.income
-                                .withValues(alpha: 0.15),
+                            backgroundColor:
+                                AppColors.income.withValues(alpha: 0.15),
                             child: Text(
                               widget.receivable.borrowerName
                                   .substring(0, 1)
@@ -161,8 +157,7 @@ class _CollectReceivableScreenState
                       ),
                       const SizedBox(height: 12),
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             'Total Piutang',
@@ -174,15 +169,13 @@ class _CollectReceivableScreenState
                           Text(
                             CurrencyFormatter.format(
                                 widget.receivable.originalAmount),
-                            style:
-                                const TextStyle(fontSize: 13),
+                            style: const TextStyle(fontSize: 13),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             'Sudah Kembali',
@@ -205,8 +198,7 @@ class _CollectReceivableScreenState
                       ),
                       const Divider(height: 16),
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             'Sisa Piutang',
@@ -239,8 +231,7 @@ class _CollectReceivableScreenState
                 onChanged: _toggleCollectFull,
                 title: const Text('Terima Semua Sekarang'),
                 subtitle: Text(
-                  CurrencyFormatter.format(
-                      widget.receivable.remainingAmount),
+                  CurrencyFormatter.format(widget.receivable.remainingAmount),
                   style: const TextStyle(
                     color: AppColors.income,
                     fontWeight: FontWeight.bold,
@@ -290,8 +281,7 @@ class _CollectReceivableScreenState
               _CollectWalletDropdown(
                 wallets: wallets,
                 selected: _targetWallet,
-                onChanged: (w) =>
-                    setState(() => _targetWallet = w),
+                onChanged: (w) => setState(() => _targetWallet = w),
               ),
 
               const SizedBox(height: 16),
@@ -381,8 +371,7 @@ class _CollectWalletDropdown extends StatelessWidget {
       initialValue: currentValue,
       decoration: const InputDecoration(
         labelText: 'Masuk ke Dompet',
-        prefixIcon:
-            Icon(Icons.account_balance_wallet_outlined),
+        prefixIcon: Icon(Icons.account_balance_wallet_outlined),
       ),
       hint: const Text('Pilih dompet tujuan'),
       isExpanded: true,

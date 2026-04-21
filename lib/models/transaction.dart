@@ -33,8 +33,6 @@ class Transactions extends Table {
   IntColumn get relatedReceivableId =>
       integer().nullable().references(Receivables, #id)();
 
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
-  BoolColumn get isDeleted =>
-      boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
 }

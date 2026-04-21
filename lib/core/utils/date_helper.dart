@@ -5,8 +5,7 @@ class DateHelper {
   DateHelper._();
 
   static final _dateFormatter = DateFormat('dd MMM yyyy', 'id_ID');
-  static final _dateTimeFormatter =
-      DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
+  static final _dateTimeFormatter = DateFormat('dd MMM yyyy, HH:mm', 'id_ID');
   static final _monthFormatter = DateFormat('MMMM yyyy', 'id_ID');
   static final _shortFormatter = DateFormat('dd/MM/yyyy');
 

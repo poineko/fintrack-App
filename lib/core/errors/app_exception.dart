@@ -18,8 +18,7 @@ class InsufficientBalanceException extends AppException {
 }
 
 class WalletNotFoundException extends AppException {
-  WalletNotFoundException(int id)
-      : super('Wallet tidak ditemukan (id: $id)');
+  WalletNotFoundException(int id) : super('Wallet tidak ditemukan (id: $id)');
 }
 
 class DebtAlreadySettledException extends AppException {

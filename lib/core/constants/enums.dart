@@ -1,9 +1,9 @@
 // lib/core/constants/enums.dart
 
 enum WalletCategory {
-  personal,   // Uang Pribadi
-  shared,     // Tabungan Bersama
-  emergency,  // Uang Jaga-jaga / Darurat
+  personal, // Uang Pribadi
+  shared, // Tabungan Bersama
+  emergency, // Uang Jaga-jaga / Darurat
 }
 
 enum TransactionType {

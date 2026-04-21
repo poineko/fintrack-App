@@ -270,9 +270,8 @@ class _CategorySelector extends StatelessWidget {
                     _labelFor(cat),
                     style: TextStyle(
                       fontSize: 10,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                       color: isSelected ? color : AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,

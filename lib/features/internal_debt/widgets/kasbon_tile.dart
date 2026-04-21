@@ -167,9 +167,8 @@ class KasbonTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: isSettled
-                              ? AppColors.settled
-                              : AppColors.active,
+                          color:
+                              isSettled ? AppColors.settled : AppColors.active,
                         ),
                       ),
                     ],
@@ -185,8 +184,7 @@ class KasbonTile extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: _progressPercent,
                   backgroundColor: AppColors.divider,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(_statusColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(_statusColor),
                   minHeight: 6,
                 ),
               ),

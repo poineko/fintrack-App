@@ -12,10 +12,8 @@ class MonthlyComparison extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final thisMonthExpense =
-        ref.watch(totalExpenseThisMonthProvider);
-    final lastMonthExpense =
-        ref.watch(totalExpenseLastMonthProvider);
+    final thisMonthExpense = ref.watch(totalExpenseThisMonthProvider);
+    final lastMonthExpense = ref.watch(totalExpenseLastMonthProvider);
     final last6Async = ref.watch(last6MonthsDataProvider);
 
     return Column(
@@ -70,9 +68,7 @@ class MonthlyComparison extends ConsumerWidget {
                           isNew: true,
                         );
                       }
-                      final delta =
-                          ((thisMonth - lastMonth) / lastMonth) *
-                              100;
+                      final delta = ((thisMonth - lastMonth) / lastMonth) * 100;
                       return _DeltaCard(
                         label: 'Perubahan',
                         delta: delta,
@@ -101,8 +97,7 @@ class MonthlyComparison extends ConsumerWidget {
         ),
 
         last6Async.when(
-          loading: () =>
-              const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Text('Error: $e'),
           data: (data) => Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -117,8 +112,7 @@ class MonthlyComparison extends ConsumerWidget {
                   const SizedBox(height: 12),
                   // Legend
                   const Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _LegendDot(
                         color: AppColors.income,
@@ -158,91 +152,87 @@ class MonthlyComparison extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: thisMonthExpense.when(
-                loading: () => const Center(
-                    child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Text('Error: $e'),
-                data: (expense) =>
-                    ref.watch(totalIncomeThisMonthProvider).when(
-                  loading: () => const Center(
-                      child: CircularProgressIndicator()),
-                  error: (e, _) => Text('Error: $e'),
-                  data: (income) {
-                    final net = income - expense;
-                    final savingsRatio = income > 0
-                        ? ((income - expense) / income * 100)
-                        : 0.0;
+                data: (expense) => ref.watch(totalIncomeThisMonthProvider).when(
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, _) => Text('Error: $e'),
+                      data: (income) {
+                        final net = income - expense;
+                        final savingsRatio = income > 0
+                            ? ((income - expense) / income * 100)
+                            : 0.0;
 
-                    return Column(
-                      children: [
-                        _SummaryRow(
-                          label: 'Total Pemasukan',
-                          value: CurrencyFormatter.format(income),
-                          color: AppColors.income,
-                        ),
-                        const Divider(height: 16),
-                        _SummaryRow(
-                          label: 'Total Pengeluaran',
-                          value: CurrencyFormatter.format(expense),
-                          color: AppColors.expense,
-                        ),
-                        const Divider(height: 16),
-                        _SummaryRow(
-                          label: 'Selisih (Net)',
-                          value: CurrencyFormatter.format(net),
-                          color: net >= 0
-                              ? AppColors.income
-                              : AppColors.expense,
-                          isBold: true,
-                        ),
-                        const Divider(height: 16),
-                        _SummaryRow(
-                          label: 'Rasio Tabungan',
-                          value:
-                              '${savingsRatio.toStringAsFixed(1)}%',
-                          color: savingsRatio >= 20
-                              ? AppColors.income
-                              : savingsRatio >= 10
-                                  ? AppColors.active
+                        return Column(
+                          children: [
+                            _SummaryRow(
+                              label: 'Total Pemasukan',
+                              value: CurrencyFormatter.format(income),
+                              color: AppColors.income,
+                            ),
+                            const Divider(height: 16),
+                            _SummaryRow(
+                              label: 'Total Pengeluaran',
+                              value: CurrencyFormatter.format(expense),
+                              color: AppColors.expense,
+                            ),
+                            const Divider(height: 16),
+                            _SummaryRow(
+                              label: 'Selisih (Net)',
+                              value: CurrencyFormatter.format(net),
+                              color: net >= 0
+                                  ? AppColors.income
                                   : AppColors.expense,
-                          isBold: true,
-                        ),
-                        if (savingsRatio < 20) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.active
-                                  .withValues(alpha: 0.1),
-                              borderRadius:
-                                  BorderRadius.circular(8),
+                              isBold: true,
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.lightbulb_outline,
-                                  color: AppColors.active,
-                                  size: 16,
+                            const Divider(height: 16),
+                            _SummaryRow(
+                              label: 'Rasio Tabungan',
+                              value: '${savingsRatio.toStringAsFixed(1)}%',
+                              color: savingsRatio >= 20
+                                  ? AppColors.income
+                                  : savingsRatio >= 10
+                                      ? AppColors.active
+                                      : AppColors.expense,
+                              isBold: true,
+                            ),
+                            if (savingsRatio < 20) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppColors.active.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    savingsRatio <= 0
-                                        ? 'Pengeluaran melebihi pemasukan bulan ini!'
-                                        : 'Idealnya rasio tabungan minimal 20% dari pemasukan.',
-                                    style: const TextStyle(
-                                      fontSize: 12,
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.lightbulb_outline,
                                       color: AppColors.active,
+                                      size: 16,
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        savingsRatio <= 0
+                                            ? 'Pengeluaran melebihi pemasukan bulan ini!'
+                                            : 'Idealnya rasio tabungan minimal 20% dari pemasukan.',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.active,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
-                    );
-                  },
-                ),
+                              ),
+                            ],
+                          ],
+                        );
+                      },
+                    ),
               ),
             ),
           ),
@@ -294,8 +284,7 @@ class _ComparisonCard extends StatelessWidget {
             loading: () => const SizedBox(
               height: 14,
               width: 14,
-              child:
-                  CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
             error: (_, __) => const Text('-'),
             data: (v) => Text(
@@ -327,8 +316,11 @@ class _DeltaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUp = delta > 0;
-    final color =
-        isNew ? AppColors.textSecondary : isUp ? AppColors.expense : AppColors.income;
+    final color = isNew
+        ? AppColors.textSecondary
+        : isUp
+            ? AppColors.expense
+            : AppColors.income;
     final icon = isNew
         ? Icons.fiber_new_outlined
         : isUp
@@ -417,7 +409,8 @@ class _TrendChart extends StatelessWidget {
         maxX: (data.length - 1).toDouble(),
         minY: 0,
         maxY: chartMaxY,
-        clipData: const FlClipData.all(), // ← Potong garis agar tidak keluar area
+        clipData:
+            const FlClipData.all(), // ← Potong garis agar tidak keluar area
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
@@ -438,8 +431,18 @@ class _TrendChart extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
                 const months = [
-                  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-                  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+                  'Jan',
+                  'Feb',
+                  'Mar',
+                  'Apr',
+                  'Mei',
+                  'Jun',
+                  'Jul',
+                  'Agu',
+                  'Sep',
+                  'Okt',
+                  'Nov',
+                  'Des',
                 ];
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -503,8 +506,7 @@ class _TrendChart extends StatelessWidget {
             isStrokeCapRound: true,
             dotData: FlDotData(
               show: true,
-              getDotPainter: (spot, percent, bar, index) =>
-                  FlDotCirclePainter(
+              getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
                 radius: 3,
                 color: AppColors.income,
                 strokeWidth: 1.5,
@@ -513,8 +515,8 @@ class _TrendChart extends StatelessWidget {
             ),
             belowBarData: BarAreaData(
               show: true,
-              cutOffY: 0,          // ← Potong area di bawah 0
-              applyCutOffY: true,  // ← Aktifkan cutoff
+              cutOffY: 0, // ← Potong area di bawah 0
+              applyCutOffY: true, // ← Aktifkan cutoff
               color: AppColors.income.withValues(alpha: 0.08),
             ),
           ),
@@ -535,8 +537,7 @@ class _TrendChart extends StatelessWidget {
             isStrokeCapRound: true,
             dotData: FlDotData(
               show: true,
-              getDotPainter: (spot, percent, bar, index) =>
-                  FlDotCirclePainter(
+              getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
                 radius: 3,
                 color: AppColors.expense,
                 strokeWidth: 1.5,
@@ -545,8 +546,8 @@ class _TrendChart extends StatelessWidget {
             ),
             belowBarData: BarAreaData(
               show: true,
-              cutOffY: 0,          // ← Potong area di bawah 0
-              applyCutOffY: true,  // ← Aktifkan cutoff
+              cutOffY: 0, // ← Potong area di bawah 0
+              applyCutOffY: true, // ← Aktifkan cutoff
               color: AppColors.expense.withValues(alpha: 0.08),
             ),
           ),
@@ -609,11 +610,8 @@ class _SummaryRow extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 13,
-            color: isBold
-                ? AppColors.textPrimary
-                : AppColors.textSecondary,
-            fontWeight:
-                isBold ? FontWeight.bold : FontWeight.normal,
+            color: isBold ? AppColors.textPrimary : AppColors.textSecondary,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         Text(

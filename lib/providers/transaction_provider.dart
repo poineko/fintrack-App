@@ -238,11 +238,51 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
     });
   }
 
+  /// Hapus transaksi + reverse saldo wallet
   Future<void> deleteTransaction(int id) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => _txRepo.softDeleteTransaction(id),
-    );
+    state = await AsyncValue.guard(() async {
+      // 1. Ambil transaksi sebelum dihapus
+      final tx = await _txRepo.getTransactionById(id);
+      if (tx == null) return;
+
+      // 2. Reverse efek ke saldo wallet
+      switch (tx.type) {
+        case 'expense':
+          // Kembalikan saldo yang sudah dikurangi
+          if (tx.sourceWalletId != null) {
+            await _walletRepo.adjustBalance(
+              tx.sourceWalletId!,
+              tx.amount, // ← tambah kembali
+            );
+          }
+        case 'income':
+          // Kurangi saldo yang sudah ditambah
+          if (tx.sourceWalletId != null) {
+            await _walletRepo.adjustBalance(
+              tx.sourceWalletId!,
+              -tx.amount, // ← kurangi kembali
+            );
+          }
+        case 'transfer':
+          // Reverse kedua wallet
+          if (tx.sourceWalletId != null) {
+            await _walletRepo.adjustBalance(
+              tx.sourceWalletId!,
+              tx.amount, // ← kembalikan ke source
+            );
+          }
+          if (tx.destinationWalletId != null) {
+            await _walletRepo.adjustBalance(
+              tx.destinationWalletId!,
+              -tx.amount, // ← tarik dari destination
+            );
+          }
+      }
+
+      // 3. Soft delete transaksi
+      await _txRepo.softDeleteTransaction(id);
+    });
   }
 }
 
@@ -266,7 +306,6 @@ final last6MonthsDataProvider = FutureProvider<List<MonthlyData>>((ref) {
   return ref.watch(transactionRepositoryProvider).getLast6MonthsData();
 });
 
-
 /// State untuk filter transaksi
 class TransactionFilter {
   final DateTime? startDate;
@@ -282,8 +321,7 @@ class TransactionFilter {
   });
 
   bool get isActive =>
-      startDate != null || endDate != null ||
-      type != null || category != null;
+      startDate != null || endDate != null || type != null || category != null;
 
   TransactionFilter copyWith({
     DateTime? startDate,
@@ -307,34 +345,27 @@ final transactionFilterProvider =
     StateProvider<TransactionFilter>((ref) => const TransactionFilter());
 
 /// Stream transaksi yang sudah difilter
-final filteredTransactionsProvider =
-    StreamProvider<List<Transaction>>((ref) {
+final filteredTransactionsProvider = StreamProvider<List<Transaction>>((ref) {
   final filter = ref.watch(transactionFilterProvider);
-  final allTxStream = ref
-      .watch(transactionRepositoryProvider)
-      .watchAllTransactions();
+  final allTxStream =
+      ref.watch(transactionRepositoryProvider).watchAllTransactions();
 
   return allTxStream.map((txs) {
     var filtered = txs;
 
     if (filter.type != null) {
-      filtered =
-          filtered.where((t) => t.type == filter.type).toList();
+      filtered = filtered.where((t) => t.type == filter.type).toList();
     }
     if (filter.category != null) {
-      filtered = filtered
-          .where((t) => t.category == filter.category)
-          .toList();
+      filtered = filtered.where((t) => t.category == filter.category).toList();
     }
     if (filter.startDate != null) {
-      filtered = filtered
-          .where((t) => !t.date.isBefore(filter.startDate!))
-          .toList();
+      filtered =
+          filtered.where((t) => !t.date.isBefore(filter.startDate!)).toList();
     }
     if (filter.endDate != null) {
-      filtered = filtered
-          .where((t) => !t.date.isAfter(filter.endDate!))
-          .toList();
+      filtered =
+          filtered.where((t) => !t.date.isAfter(filter.endDate!)).toList();
     }
     return filtered;
   });

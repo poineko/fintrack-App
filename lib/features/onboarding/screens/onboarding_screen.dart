@@ -107,8 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                onPageChanged: (index) =>
-                    setState(() => _currentPage = index),
+                onPageChanged: (index) => setState(() => _currentPage = index),
                 itemCount: _pages.length,
                 itemBuilder: (context, index) =>
                     _OnboardingPage(data: _pages[index]),
@@ -148,19 +147,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: OutlinedButton(
                         onPressed: () {
                           _pageController.previousPage(
-                            duration: const Duration(
-                                milliseconds: 400),
+                            duration: const Duration(milliseconds: 400),
                             curve: Curves.easeInOut,
                           );
                         },
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           side: BorderSide(
                             color: _pages[_currentPage].color,
                           ),
-                          foregroundColor:
-                              _pages[_currentPage].color,
+                          foregroundColor: _pages[_currentPage].color,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -179,11 +175,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: ElevatedButton(
                         onPressed: _next,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _pages[_currentPage].color,
+                          backgroundColor: _pages[_currentPage].color,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

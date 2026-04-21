@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/enums.dart';
 import '../../../core/database/app_database.dart';
-import '../../../core/utils/currency_formatter.dart'; 
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_helper.dart';
 import '../../../providers/internal_debt_provider.dart';
 import '../../../providers/wallet_provider.dart';
@@ -15,8 +15,7 @@ class KasbonFormScreen extends ConsumerStatefulWidget {
   const KasbonFormScreen({super.key});
 
   @override
-  ConsumerState<KasbonFormScreen> createState() =>
-      _KasbonFormScreenState();
+  ConsumerState<KasbonFormScreen> createState() => _KasbonFormScreenState();
 }
 
 class _KasbonFormScreenState extends ConsumerState<KasbonFormScreen> {
@@ -72,12 +71,9 @@ class _KasbonFormScreenState extends ConsumerState<KasbonFormScreen> {
 
     try {
       final amount =
-          double.tryParse(_amountController.text.replaceAll('.', '')) ??
-              0.0;
+          double.tryParse(_amountController.text.replaceAll('.', '')) ?? 0.0;
 
-      await ref
-          .read(internalDebtNotifierProvider.notifier)
-          .createKasbon(
+      await ref.read(internalDebtNotifierProvider.notifier).createKasbon(
             title: _titleController.text.trim(),
             amount: amount,
             sourceWalletId: _sourceWallet!.id,
@@ -121,8 +117,7 @@ class _KasbonFormScreenState extends ConsumerState<KasbonFormScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Ambil Kasbon')),
       body: walletsAsync.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (wallets) {
           // Sumber kasbon: shared atau emergency
@@ -272,8 +267,7 @@ class _KasbonFormScreenState extends ConsumerState<KasbonFormScreen> {
                   label: 'Masuk Ke Dompet',
                   wallets: destWallets,
                   selected: _destinationWallet,
-                  onChanged: (w) =>
-                      setState(() => _destinationWallet = w),
+                  onChanged: (w) => setState(() => _destinationWallet = w),
                   emptyHint: 'Tidak ada dompet personal',
                 ),
 
@@ -285,8 +279,7 @@ class _KasbonFormScreenState extends ConsumerState<KasbonFormScreen> {
                   child: InputDecorator(
                     decoration: const InputDecoration(
                       labelText: 'Target Lunas (opsional)',
-                      prefixIcon:
-                          Icon(Icons.calendar_today_outlined),
+                      prefixIcon: Icon(Icons.calendar_today_outlined),
                       suffixIcon: Icon(Icons.arrow_drop_down),
                     ),
                     child: Text(

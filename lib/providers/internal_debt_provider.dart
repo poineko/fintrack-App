@@ -9,8 +9,7 @@ import 'wallet_provider.dart';
 // REPOSITORY PROVIDER
 // ─────────────────────────────────────────────
 
-final internalDebtRepositoryProvider =
-    Provider<InternalDebtRepository>((ref) {
+final internalDebtRepositoryProvider = Provider<InternalDebtRepository>((ref) {
   return InternalDebtRepository(
     ref.watch(databaseProvider),
     ref.watch(walletRepositoryProvider),
@@ -21,17 +20,12 @@ final internalDebtRepositoryProvider =
 // STREAM PROVIDERS
 // ─────────────────────────────────────────────
 
-final activeDebtsProvider =
-    StreamProvider<List<InternalDebt>>((ref) {
-  return ref
-      .watch(internalDebtRepositoryProvider)
-      .watchActiveDebts();
+final activeDebtsProvider = StreamProvider<List<InternalDebt>>((ref) {
+  return ref.watch(internalDebtRepositoryProvider).watchActiveDebts();
 });
 
 final allDebtsProvider = StreamProvider<List<InternalDebt>>((ref) {
-  return ref
-      .watch(internalDebtRepositoryProvider)
-      .watchAllDebts();
+  return ref.watch(internalDebtRepositoryProvider).watchAllDebts();
 });
 
 // ─────────────────────────────────────────────
@@ -39,9 +33,7 @@ final allDebtsProvider = StreamProvider<List<InternalDebt>>((ref) {
 // ─────────────────────────────────────────────
 
 final totalActiveDebtProvider = StreamProvider<double>((ref) {
-  return ref
-      .watch(internalDebtRepositoryProvider)
-      .watchTotalActiveDebt();
+  return ref.watch(internalDebtRepositoryProvider).watchTotalActiveDebt();
 });
 
 // ─────────────────────────────────────────────

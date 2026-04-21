@@ -46,9 +46,9 @@ class WalletDetailScreen extends ConsumerWidget {
     final txAsync = ref.watch(transactionsByWalletProvider(wallet.id));
     // Watch wallet terbaru agar saldo real-time
     final walletAsync = ref.watch(allWalletsProvider);
-    final currentWallet = walletAsync.asData?.value
-        .where((w) => w.id == wallet.id)
-        .firstOrNull ?? wallet;
+    final currentWallet =
+        walletAsync.asData?.value.where((w) => w.id == wallet.id).firstOrNull ??
+            wallet;
 
     return Scaffold(
       appBar: AppBar(
@@ -188,8 +188,7 @@ class WalletDetailScreen extends ConsumerWidget {
           // ── Transaction List ──────────────
           Expanded(
             child: txAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e')),
               data: (transactions) {
                 if (transactions.isEmpty) {
@@ -212,11 +211,9 @@ class WalletDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
-                          onPressed: () =>
-                              Navigator.of(context).push(
+                          onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  const TransactionFormScreen(),
+                              builder: (_) => const TransactionFormScreen(),
                             ),
                           ),
                           icon: const Icon(Icons.add),
@@ -240,8 +237,7 @@ class WalletDetailScreen extends ConsumerWidget {
                     final entry = grouped[index];
                     final date = entry.key;
                     final txs = entry.value;
-                    final dayTotal =
-                        txs.fold<double>(0, (sum, tx) {
+                    final dayTotal = txs.fold<double>(0, (sum, tx) {
                       if (tx.type == 'income') return sum + tx.amount;
                       if (tx.type == 'expense') {
                         return sum - tx.amount;
@@ -253,11 +249,9 @@ class WalletDetailScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              16, 12, 16, 4),
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 DateHelper.formatRelative(date),
@@ -283,15 +277,12 @@ class WalletDetailScreen extends ConsumerWidget {
                         ...txs.map((tx) => TransactionTile(
                               transaction: tx,
                               onDelete: () => ref
-                                  .read(transactionNotifierProvider
-                                      .notifier)
+                                  .read(transactionNotifierProvider.notifier)
                                   .deleteTransaction(tx.id),
-                              onEdit: () =>
-                                  Navigator.of(context).push(
+                              onEdit: () => Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) =>
-                                      TransactionFormScreen(
-                                          transaction: tx),
+                                      TransactionFormScreen(transaction: tx),
                                 ),
                               ),
                             )),
@@ -321,12 +312,10 @@ class WalletDetailScreen extends ConsumerWidget {
   ) {
     final Map<DateTime, List<Transaction>> map = {};
     for (final tx in transactions) {
-      final date =
-          DateTime(tx.date.year, tx.date.month, tx.date.day);
+      final date = DateTime(tx.date.year, tx.date.month, tx.date.day);
       map.putIfAbsent(date, () => []).add(tx);
     }
-    final sorted = map.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key));
+    final sorted = map.entries.toList()..sort((a, b) => b.key.compareTo(a.key));
     return sorted;
   }
 }

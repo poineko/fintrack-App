@@ -84,11 +84,9 @@ class TransactionListScreen extends ConsumerWidget {
                       label: _categoryLabel(filter.category!),
                       onRemove: () => ref
                           .read(transactionFilterProvider.notifier)
-                          .state =
-                          filter.copyWith(clearCategory: true),
+                          .state = filter.copyWith(clearCategory: true),
                     ),
-                  if (filter.startDate != null ||
-                      filter.endDate != null)
+                  if (filter.startDate != null || filter.endDate != null)
                     _FilterChip(
                       label:
                           '${filter.startDate != null ? DateHelper.formatShort(filter.startDate!) : '...'} - ${filter.endDate != null ? DateHelper.formatShort(filter.endDate!) : '...'}',
@@ -143,8 +141,7 @@ class TransactionListScreen extends ConsumerWidget {
           // ── Transaction List ───────────────
           Expanded(
             child: txAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e')),
               data: (transactions) {
                 if (transactions.isEmpty) {
@@ -171,11 +168,9 @@ class TransactionListScreen extends ConsumerWidget {
                         if (!filter.isActive) ...[
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
-                            onPressed: () =>
-                                Navigator.of(context).push(
+                            onPressed: () => Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const TransactionFormScreen(),
+                                builder: (_) => const TransactionFormScreen(),
                               ),
                             ),
                             icon: const Icon(Icons.add),
@@ -282,12 +277,10 @@ class TransactionListScreen extends ConsumerWidget {
   ) {
     final Map<DateTime, List<Transaction>> map = {};
     for (final tx in txs) {
-      final date =
-          DateTime(tx.date.year, tx.date.month, tx.date.day);
+      final date = DateTime(tx.date.year, tx.date.month, tx.date.day);
       map.putIfAbsent(date, () => []).add(tx);
     }
-    return map.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key));
+    return map.entries.toList()..sort((a, b) => b.key.compareTo(a.key));
   }
 }
 
@@ -409,8 +402,7 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
                               ? AppColors.expense
                               : AppColors.transfer,
                       onTap: () => setState(() {
-                        _selectedType =
-                            _selectedType == type ? null : type;
+                        _selectedType = _selectedType == type ? null : type;
                         _selectedCategory = null;
                       }),
                     ))
@@ -484,9 +476,8 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
                       _startDate = null;
                       _endDate = null;
                     });
-                    widget.ref
-                        .read(transactionFilterProvider.notifier)
-                        .state = const TransactionFilter();
+                    widget.ref.read(transactionFilterProvider.notifier).state =
+                        const TransactionFilter();
                     Navigator.pop(context);
                   },
                   child: const Text('Reset'),
@@ -532,9 +523,8 @@ class _TypeChip extends StatelessWidget {
           vertical: 8,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? color.withValues(alpha: 0.15)
-              : Colors.transparent,
+          color:
+              isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? color : AppColors.divider,
@@ -544,8 +534,7 @@ class _TypeChip extends StatelessWidget {
           label,
           style: TextStyle(
             color: isSelected ? color : AppColors.textSecondary,
-            fontWeight:
-                isSelected ? FontWeight.bold : FontWeight.normal,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 13,
           ),
         ),
@@ -646,9 +635,7 @@ class _DateGroup extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: dayTotal >= 0
-                      ? AppColors.income
-                      : AppColors.expense,
+                  color: dayTotal >= 0 ? AppColors.income : AppColors.expense,
                 ),
               ),
             ],
